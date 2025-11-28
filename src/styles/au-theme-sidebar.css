@@ -1,0 +1,73 @@
+
+:root {
+    --au-blue: #4637d2;
+    --au-green: #00d746;
+    
+    --sidebar-bg: white;
+    --sidebar-border: rgba(0, 215, 70, 0.2);
+    --sidebar-text: #333;
+    --sidebar-hover: rgba(70, 55, 210, 0.1);
+    --sidebar-active: var(--au-blue);
+    --sidebar-active-text: white;
+    --sidebar-icon: var(--au-blue);
+    --sidebar-accent: rgba(70, 55, 210, 0.05);
+  }
+  
+  .dark {
+    --sidebar-bg: #1a1a1a;
+    --sidebar-border: rgba(0, 215, 70, 0.1);
+    --sidebar-text: #e0e0e0;
+    --sidebar-hover: rgba(70, 55, 210, 0.2);
+    --sidebar-active: var(--au-blue);
+    --sidebar-active-text: white;
+    --sidebar-icon: var(--au-blue);
+    --sidebar-accent: rgba(70, 55, 210, 0.1);
+  }
+  
+  [data-sidebar="sidebar"] {
+    background-color: var(--sidebar-bg);
+    border-color: var(--sidebar-border);
+  }
+  
+  .SidebarMenuButton {
+    color: var(--sidebar-text);
+  }
+  
+  .SidebarMenuButton:hover {
+    background-color: var(--sidebar-hover);
+  }
+  
+  .SidebarMenuButton[data-active="true"] {
+    background-color: var(--sidebar-active);
+    color: var(--sidebar-active-text);
+  }
+  
+  [data-sidebar] svg {
+    color: var(--sidebar-icon);
+  }
+  
+  [data-sidebar] [data-active="true"] svg {
+    color: var(--sidebar-active-text);
+  }
+  
+  .TeamSwitcher {
+    border-bottom: 1px solid var(--sidebar-border);
+  }
+  
+  [data-sidebar] .Avatar {
+    border: 1px solid var(--au-green);
+  }
+  
+  [data-sidebar] [data-active="true"]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: var(--au-green);
+  }
+  
+  [data-sidebar] .DropdownMenuContent {
+    border-color: var(--sidebar-border);
+  }

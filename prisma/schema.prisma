@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String              @id @default(uuid())
+  name               String
+  email              String              @unique
+  password           String?
+  employeeId         String?
+  clerkId            String              @unique
+  role               String
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  attendances        Attendance[]
+  reviewedExceptions AttendanceException[] @relation("ReviewedBy")
+
+  subjectsTaught     SubjectTeacher[]
+}
+
+model Student {
+  id            String                @id @default(uuid())
+  name          String
+  usnNumber     String                @unique
+  email         String                @unique
+  parentEmail   String?
+  password      String?
+  clerkId       String?               @unique
+  role          String                @default("student")
+  active        Boolean               @default(true)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  notifications AbsenceNotification[]
+  attendances   Attendance[]
+  batches       StudentBatch[]
+  exceptions    AttendanceException[] @relation("StudentExceptions")
+}
+
+model Batch {
+  id          String         @id @default(uuid())
+  name        String
+  isDisabled  Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  attendances Attendance[]
+  students    StudentBatch[]
+  subjects    SubjectBatch[]
+}
+
+model Subject {
+  id          String             @id @default(uuid())
+  name        String
+  startDate   DateTime?
+  endDate     DateTime?
+  status      SubjectStatus      @default(inactive)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  attendances Attendance[]
+  batches     SubjectBatch[]
+  teachers    SubjectTeacher[] 
+}
+
+
+model SubjectTeacher {
+  id         String   @id @default(uuid())
+  subjectId  String
+  teacherId  String
+  subject    Subject  @relation(fields: [subjectId], references: [id])
+  teacher    User     @relation(fields: [teacherId], references: [id])
+
+  @@unique([subjectId, teacherId]) 
+}
+
+model AttendanceException {
+  id            String   @id @default(uuid())
+  studentId     String
+  date          String
+  sessionId     String?
+  reasonType    String
+  reason        String?
+  status        String  @default("pending")
+  fileUrl       String
+  reviewedById  String?
+  reviewedAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  student       Student  @relation("StudentExceptions", fields: [studentId], references: [id])
+  reviewedBy    User?    @relation("ReviewedBy", fields: [reviewedById], references: [id])
+}
+
+model Attendance {
+  id               String   @id @default(uuid())
+  sessionId        String   @default(uuid())
+  teacherId        String?
+  studentId        String?
+  subjectId        String?
+  batchId          String?
+  date             String
+  time             String
+  attendanceStatus String
+  isLocked         Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  batch            Batch?   @relation(fields: [batchId], references: [id])
+  student          Student? @relation(fields: [studentId], references: [id])
+  subject          Subject? @relation(fields: [subjectId], references: [id])
+  teacher          User?    @relation(fields: [teacherId], references: [id])
+}
+
+model AbsenceNotification {
+  id                String    @id @default(uuid())
+  studentId         String
+  consecutiveDays   Int       @default(0)
+  lastAbsenceDate   DateTime?
+  notificationLevel Int       @default(0)
+  notified          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  student           Student   @relation(fields: [studentId], references: [id])
+}
+
+model StudentBatch {
+  id        String  @id @default(uuid())
+  studentId String
+  batchId   String
+  batch     Batch   @relation(fields: [batchId], references: [id])
+  student   Student @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, batchId])
+}
+
+model SubjectBatch {
+  id        String  @id @default(uuid())
+  subjectId String
+  batchId   String
+  batch     Batch   @relation(fields: [batchId], references: [id])
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  @@unique([subjectId, batchId])
+}
+
+enum SubjectStatus {
+  active
+  inactive
+}
